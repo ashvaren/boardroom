@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashvaren Boardroom</title>
+<style>
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:    #1A1A2E;
+  --blue:    #2C5F8A;
+  --blue-lt: #EAF1F8;
+  --ink:     #1A1A2E;
+  --muted:   #666;
+  --border:  #D8D8D8;
+  --bg:      #F9F9F7;
+  --white:   #FFFFFF;
+  --radius:  6px;
+  --cfo:     #2C5F8A;
+  --ceo:     #2A6B44;
+  --pe:      #7A4A1E;
+  --counsel: #5A3472;
+  --clapham: #888;
+}
+
+body {
+  font-family: "Calibri", "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+.shell {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--navy);
+  color: #fff;
+  padding: 14px 28px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.topbar-title { font-size: 18px; font-weight: 600; letter-spacing: 0.02em; }
+.topbar-sub   { font-size: 12px; opacity: 0.55; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.sidebar {
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px 18px 40px;
+}
+
+.main {
+  overflow-y: auto;
+  padding: 24px 28px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Sidebar: panel cards ─────────────────────────────────────────────────── */
+.panel-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.agent-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  background: var(--white);
+  overflow: hidden;
+}
+.agent-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.agent-card-header:hover { background: #f5f5f3; }
+.agent-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-cfo     { background: var(--cfo); }
+.dot-ceo     { background: var(--ceo); }
+.dot-pe      { background: var(--pe); }
+.dot-counsel { background: var(--counsel); }
+.dot-clapham { background: var(--clapham); }
+
+.agent-label { font-size: 12px; font-weight: 600; flex: 1; }
+.agent-toggle { font-size: 10px; color: var(--muted); }
+
+.ocean-panel { padding: 8px 12px 12px; border-top: 1px solid #eee; }
+.ocean-row { margin-bottom: 8px; }
+.ocean-row:last-child { margin-bottom: 0; }
+.ocean-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+.ocean-name { font-size: 10px; color: var(--muted); }
+.ocean-val  { font-size: 10px; font-weight: 600; color: var(--ink); min-width: 22px; text-align: right; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%; height: 4px;
+  border-radius: 2px;
+  background: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--navy);
+  cursor: pointer;
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 1px var(--border);
+}
+input[type=range]:disabled { opacity: 0.35; cursor: not-allowed; }
+input[type=range]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
+
+.locked-note {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: italic;
+  padding: 4px 12px 10px;
+}
+
+/* ── Main: input card ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 160px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: #FAFAF8;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; border-color: transparent; }
+textarea::placeholder { color: #aaa; }
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+}
+.input-row label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+}
+select:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 22px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--navy);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s;
+}
+.btn-primary:hover:not(:disabled)  { background: #2a2a48; }
+.btn-primary:active:not(:disabled) { background: #111124; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-secondary:hover { background: #f5f5f3; color: var(--ink); }
+
+/* ── Status ───────────────────────────────────────────────────────────────── */
+.status-bar {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+}
+.spinner {
+  width: 12px; height: 12px;
+  border: 2px solid #ddd;
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Progress tracker ─────────────────────────────────────────────────────── */
+.progress-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.progress-chip {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--white);
+  transition: all 0.2s;
+}
+.progress-chip.active  { background: var(--navy); color: #fff; border-color: var(--navy); }
+.progress-chip.done    { background: #e8f0e8; color: #2A6B44; border-color: #b8d8b8; }
+
+/* ── Transcript ───────────────────────────────────────────────────────────── */
+.transcript { display: flex; flex-direction: column; gap: 12px; }
+
+.msg {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.msg-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid #eee;
+}
+.msg-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.msg-name  { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.msg-round { font-size: 10px; color: var(--muted); margin-left: auto; }
+
+.msg-body {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  color: var(--ink);
+}
+
+/* Agent colour accents */
+.msg-cfo     .msg-head { background: #EAF1F8; }
+.msg-ceo     .msg-head { background: #EAF4ED; }
+.msg-pe      .msg-head { background: #F8F1EA; }
+.msg-counsel .msg-head { background: #F3EEF8; }
+.msg-clapham .msg-head { background: #F5F5F5; }
+.msg-clapham { opacity: 0.72; }
+.msg-coord   .msg-head { background: #F0F0EE; }
+
+.rc-cfo     { color: var(--cfo); }
+.rc-ceo     { color: var(--ceo); }
+.rc-pe      { color: var(--pe); }
+.rc-counsel { color: var(--counsel); }
+.rc-clapham { color: var(--clapham); }
+.rc-coord   { color: var(--muted); }
+
+/* ── Verdict card ─────────────────────────────────────────────────────────── */
+.verdict-card {
+  border: 2px solid var(--navy);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+}
+.verdict-head {
+  background: var(--navy);
+  color: #fff;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.verdict-head-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.verdict-body {
+  padding: 16px 18px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  color: var(--ink);
+}
+
+/* ── Section separator ────────────────────────────────────────────────────── */
+.section-sep {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-sep::before, .section-sep::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Utility ──────────────────────────────────────────────────────────────── */
+.copy-btn {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  background: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 60px 0;
+  line-height: 1.8;
+}
+.empty-state strong { display: block; font-size: 15px; color: var(--ink); margin-bottom: 6px; }
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+
+.topbar-settings {
+  margin-left: auto;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.7);
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.topbar-settings:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+@media (max-width: 680px) {
+  .shell { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 14px; }
+  .main { padding: 16px 14px 40px; }
+  .topbar { padding: 12px 16px; }
+  .input-row { flex-wrap: wrap; }
+  .agent-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <span class="topbar-title">Ashvaren Boardroom</span>
+    <span class="topbar-sub">Advisory Panel · Private Use</span>
+    <button class="topbar-settings" onclick="openSettings()" title="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </header>
+
+  <!-- Sidebar: panel configuration -->
+  <aside class="sidebar" id="sidebar">
+    <div class="panel-section-label">Panel configuration</div>
+
+    <!-- Agent cards injected by JS -->
+    <div id="agent-cards"></div>
+  </aside>
+
+  <!-- Main workspace -->
+  <main class="main" id="main">
+
+    <!-- Input card -->
+    <div class="card" id="input-card">
+      <div class="card-title">Document or thesis</div>
+      <textarea id="doc-input"
+        placeholder="Paste your business plan, financial model summary, strategy paper, term sheet, or describe the situation the panel should interrogate..."></textarea>
+      <div class="input-row">
+        <label for="rounds-select">Debate rounds</label>
+        <select id="rounds-select">
+          <option value="1">1 round: quick take</option>
+          <option value="2" selected>2 rounds: standard</option>
+          <option value="3">3 rounds: deep dive</option>
+        </select>
+        <button class="btn-primary" id="run-btn" onclick="runDebate()">
+          Convene the panel
+        </button>
+        <button class="btn-secondary" id="clear-btn" onclick="clearAll()" style="display:none">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Status / progress -->
+    <div id="status-area" style="display:none">
+      <div class="status-bar" id="status-bar"></div>
+      <div class="progress-row" id="progress-row" style="margin-top:8px"></div>
+    </div>
+
+    <!-- Transcript -->
+    <div id="transcript-area"></div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <strong>Panel ready</strong>
+      Paste a document above, configure the panel if needed,<br>
+      then convene to begin the debate.
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── Agent definitions ─────────────────────────────────────────────────────────
+const AGENTS = [
+  {
+    id: "cfo", label: "CFO", fullLabel: "Chief Financial Officer",
+    defaults: { O: 35, C: 85, E: 40, A: 30, N: 65 },
+    dotClass: "dot-cfo", msgClass: "msg-cfo", rcClass: "rc-cfo",
+  },
+  {
+    id: "ceo", label: "CEO", fullLabel: "Chief Executive Officer",
+    defaults: { O: 75, C: 65, E: 80, A: 55, N: 35 },
+    dotClass: "dot-ceo", msgClass: "msg-ceo", rcClass: "rc-ceo",
+  },
+  {
+    id: "pe", label: "PE Investor", fullLabel: "Private Equity Investor",
+    defaults: { O: 60, C: 80, E: 55, A: 20, N: 40 },
+    dotClass: "dot-pe", msgClass: "msg-pe", rcClass: "rc-pe",
+  },
+  {
+    id: "counsel", label: "Counsel", fullLabel: "General Counsel",
+    defaults: { O: 40, C: 90, E: 35, A: 25, N: 55 },
+    dotClass: "dot-counsel", msgClass: "msg-counsel", rcClass: "rc-counsel",
+  },
+  {
+    id: "clapham", label: "Clapham", fullLabel: "Clapham Omnibus",
+    defaults: { O: 50, C: 50, E: 50, A: 50, N: 50 },
+    dotClass: "dot-clapham", msgClass: "msg-clapham", rcClass: "rc-clapham",
+    locked: true,
+  },
+];
+
+const OCEAN = [
+  { key: "O", name: "Openness" },
+  { key: "C", name: "Conscientiousness" },
+  { key: "E", name: "Extraversion" },
+  { key: "A", name: "Agreeableness" },
+  { key: "N", name: "Neuroticism" },
+];
+
+const OCEAN_DESC = {
+  O: { lo: "conventional, framework-driven", mid: "balanced, open to some novelty", hi: "highly curious, open to novel ideas" },
+  C: { lo: "flexible, less detail-focused", mid: "moderately organised and disciplined", hi: "highly disciplined, detail-obsessed, rigorous" },
+  E: { lo: "reserved, speaks only when it matters", mid: "moderately engaged", hi: "assertive, persuasive, dominant in conversation" },
+  A: { lo: "adversarial, pushes back hard", mid: "balanced between cooperation and challenge", hi: "cooperative, inclined to agree" },
+  N: { lo: "emotionally resilient, calm under pressure", mid: "moderately risk-sensitive", hi: "highly risk-sensitive, reactive to uncertainty" },
+};
+
+function oceanDesc(key, val) {
+  const d = OCEAN_DESC[key];
+  return val <= 30 ? d.lo : val >= 70 ? d.hi : d.mid;
+}
+
+function personalityPrompt(vals) {
+  return OCEAN.map(({ key, name }) =>
+    `${name} ${vals[key]}/100: ${oceanDesc(key, vals[key])}`
+  ).join("; ");
+}
+
+// ── Build sidebar ─────────────────────────────────────────────────────────────
+function buildSidebar() {
+  const container = document.getElementById("agent-cards");
+  container.innerHTML = "";
+  AGENTS.forEach(ag => {
+    const card = document.createElement("div");
+    card.className = "agent-card";
+    card.id = `card-${ag.id}`;
+
+    // Header
+    const header = document.createElement("div");
+    header.className = "agent-card-header";
+    header.innerHTML = `
+      <span class="agent-dot ${ag.dotClass}"></span>
+      <span class="agent-label">${ag.label}</span>
+      <span class="agent-toggle" id="toggle-${ag.id}">▾</span>
+    `;
+    header.onclick = () => togglePanel(ag.id);
+    card.appendChild(header);
+
+    if (ag.locked) {
+      const note = document.createElement("div");
+      note.className = "locked-note";
+      note.id = `ocean-${ag.id}`;
+      note.style.display = "none";
+      note.textContent = "Fixed at 50 on all dimensions. Represents educated mainstream consensus.";
+      card.appendChild(note);
+    } else {
+      const panel = document.createElement("div");
+      panel.className = "ocean-panel";
+      panel.id = `ocean-${ag.id}`;
+      panel.style.display = "none";
+
+      OCEAN.forEach(({ key, name }) => {
+        const row = document.createElement("div");
+        row.className = "ocean-row";
+        row.innerHTML = `
+          <div class="ocean-meta">
+            <span class="ocean-name">${name}</span>
+            <span class="ocean-val" id="${ag.id}-${key}-val">${ag.defaults[key]}</span>
+          </div>
+          <input type="range" min="0" max="100" value="${ag.defaults[key]}"
+            id="${ag.id}-${key}"
+            oninput="document.getElementById('${ag.id}-${key}-val').textContent=this.value">
+        `;
+        panel.appendChild(row);
+      });
+      card.appendChild(panel);
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function togglePanel(id) {
+  const panel = document.getElementById(`ocean-${id}`);
+  const toggle = document.getElementById(`toggle-${id}`);
+  const isOpen = panel.style.display !== "none";
+  panel.style.display = isOpen ? "none" : "block";
+  toggle.textContent = isOpen ? "▾" : "▴";
+}
+
+function getOcean(agentId) {
+  const ag = AGENTS.find(a => a.id === agentId);
+  const vals = {};
+  OCEAN.forEach(({ key }) => {
+    const el = document.getElementById(`${agentId}-${key}`);
+    vals[key] = el ? parseInt(el.value) : ag.defaults[key];
+  });
+  return vals;
+}
+
+// ── System prompts ────────────────────────────────────────────────────────────
+function sysCoordBrief() {
+  return `You are the coordinator of the Ashvaren Boardroom, a private advisory panel. Your role is to manage structured debate, not to participate in it.
+
+Produce three sections with these exact headings:
+
+BRIEF
+Summarise the document in two to three sentences. Be precise and commercial. No padding.
+
+KEY ISSUES
+Identify three to four specific issues or questions the panel should address. These must be concrete and drawn directly from the content. Not generic.
+
+OPENING QUESTIONS
+Assign one specific opening question to each of the following, on a new line with their name as a label: CFO, CEO, PE INVESTOR, COUNSEL, CLAPHAM OMNIBUS. Each question must be tailored to that adviser's expertise and to this specific document.
+
+Plain prose within each section. No bullet points. No em dashes.`;
+}
+
+function sysCoordVerdict() {
+  return `You are the coordinator of the Ashvaren Boardroom. You have overseen a structured debate between four specialist advisers (CFO, CEO, PE Investor, Counsel) and one reference voice (Clapham Omnibus, representing educated mainstream consensus).
+
+Synthesise the debate under these exact headings in this order:
+
+UNCONVENTIONAL INSIGHTS
+Arguments, observations, or concerns raised by the specialist panel that the Clapham Omnibus did not raise. Attribute each to the adviser who raised it. Be specific. This is the most important section.
+
+CONSENSUS VIEWS
+Points where Clapham and at least one specialist broadly agreed. Note them briefly.
+
+PRINCIPAL TENSIONS
+The most important unresolved disagreements between specialist panel members.
+
+CRITICAL QUESTIONS
+Exactly three to five questions that must be answered before any decision. Written as direct interrogatives.
+
+OVERALL VERDICT
+State clearly whether the weight of specialist opinion is positive, negative, or genuinely uncertain. Give your reasoning in three to five sentences. No hedging.
+
+Plain professional prose throughout. No bullet points. No em dashes. No AI clichés. This will go directly into a client file.`;
+}
+
+function sysAgent(ag, round, totalRounds) {
+  const vals = getOcean(ag.id);
+  const personality = personalityPrompt(vals);
+  const roundNote = round === 1
+    ? "This is your opening position. Address the coordinator's question to you directly, then raise any further concerns the document warrants."
+    : round === totalRounds
+      ? "This is the final round. Consolidate your position. State clearly what you now accept, what you reject, and what remains unresolved."
+      : "Respond directly to the other advisers. Do not repeat your opening position. Develop the argument or concede where sound.";
+
+  const mandates = {
+    cfo: `You are the CFO on a private advisory panel. Your mandate: cash flow, unit economics, funding requirements, working capital, downside scenarios, and internal consistency of numerical assumptions. Sceptical by default, not obstructionist. When you reject something, state exactly what would need to be true for you to change your view.`,
+    ceo: `You are the CEO on a private advisory panel. Your mandate: market opportunity, competitive positioning, execution credibility, speed of adoption, and whether the strategy is coherent and deliverable. You have built and scaled businesses. Push back on the CFO when conservatism obscures a genuine opportunity. Push back on the PE Investor when they are too short-term.`,
+    pe: `You are the PE Investor on a private advisory panel. Your mandate: value creation potential, IRR, multiple expansion, exit optionality, entry discipline, capital structure, and management quality. You think in outcomes, not activities. Challenge the CFO when they are too near-term. Challenge the CEO when vision outruns substance.`,
+    counsel: `You are Counsel on a private advisory panel. You are a senior lawyer with deep commercial and financial experience, operating as a CFO/corporate lawyer/general counsel hybrid. Your mandate: structure, enforceability, governance, control provisions, regulatory risk, and whether the legal and contractual framework supports the commercial assumptions. You find the problem the room wants to ignore. You are not a blocker; you stay in the commercial conversation.`,
+    clapham: `You are the Clapham Omnibus on a private advisory panel. You represent the educated mainstream professional: sensible, experienced, consensus-driven. Articulate the obvious read, standard market view, and received wisdom. Do not take contrarian positions. Your value is epistemic contrast.`,
+  };
+
+  return `${mandates[ag.id]}
+
+Your personality profile: ${personality}.
+
+${roundNote}
+
+Write in plain professional prose. Three to five paragraphs maximum. No bullet points. No em dashes. No padding. No AI clichés.`;
+}
+
+// ── Config: Worker URL ────────────────────────────────────────────────────────
+const CFG_KEY = "ashvaren_boardroom_worker_url";
+function getWorkerUrl() { return (localStorage.getItem(CFG_KEY) || "").trim(); }
+function saveWorkerUrl(url) { localStorage.setItem(CFG_KEY, url.trim()); }
+
+// ── API call ──────────────────────────────────────────────────────────────────
+async function callClaude(system, messages, maxTokens) {
+  const workerUrl = getWorkerUrl();
+  if (!workerUrl) throw new Error("Worker URL not configured. Open Settings (gear icon) to add it.");
+  const endpoint = workerUrl.replace(/\/$/, "") + "/boardroom";
+  const resp = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ system, messages, max_tokens: maxTokens || 1024 }),
+  });
+  if (!resp.ok) {
+    const txt = await resp.text();
+    throw new Error("Worker error " + resp.status + ": " + txt.slice(0, 200));
+  }
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  return data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+let progressSteps = [];
+
+function initProgress(rounds) {
+  const row = document.getElementById("progress-row");
+  row.innerHTML = "";
+  progressSteps = [];
+
+  const steps = ["Brief"];
+  for (let r = 1; r <= rounds; r++) {
+    AGENTS.forEach(ag => steps.push(`${ag.label} R${r}`));
+  }
+  steps.push("Verdict");
+
+  steps.forEach((s, i) => {
+    const chip = document.createElement("span");
+    chip.className = "progress-chip";
+    chip.id = `chip-${i}`;
+    chip.textContent = s;
+    row.appendChild(chip);
+    progressSteps.push(chip);
+  });
+}
+
+function markProgress(i, state) {
+  const chip = progressSteps[i];
+  if (!chip) return;
+  chip.classList.remove("active", "done");
+  if (state === "active") chip.classList.add("active");
+  if (state === "done")   chip.classList.add("done");
+}
+
+function setStatus(html) {
+  const bar = document.getElementById("status-bar");
+  bar.innerHTML = html ? `<div class="spinner"></div><span>${html}</span>` : "";
+}
+
+function appendMsg(agentId, label, text, round, isCoord, isVerdict) {
+  const area = document.getElementById("transcript-area");
+
+  if (isVerdict) {
+    const vc = document.createElement("div");
+    vc.className = "verdict-card";
+    vc.id = "verdict-card";
+    vc.innerHTML = `
+      <div class="verdict-head">
+        <span class="verdict-head-title">Panel Verdict</span>
+        <button class="copy-btn" onclick="copyVerdict()">Copy verdict</button>
+      </div>
+      <div class="verdict-body" id="verdict-body">${escHtml(text)}</div>`;
+    area.appendChild(vc);
+    vc.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  const ag = AGENTS.find(a => a.id === agentId);
+  const div = document.createElement("div");
+  div.className = `msg ${ag ? ag.msgClass : "msg-coord"}`;
+  div.innerHTML = `
+    <div class="msg-head">
+      <span class="msg-dot ${ag ? ag.dotClass : ""}"></span>
+      <span class="msg-name ${ag ? ag.rcClass : "rc-coord"}">${label}</span>
+      ${round ? `<span class="msg-round">Round ${round}</span>` : ""}
+    </div>
+    <div class="msg-body">${escHtml(text)}</div>`;
+  area.appendChild(div);
+  div.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function buildHistory(transcriptLog) {
+  return transcriptLog.map(e => `${e.speaker} (Round ${e.round}):\n${e.text}`).join("\n\n---\n\n");
+}
+
+// ── Clear ─────────────────────────────────────────────────────────────────────
+function clearAll() {
+  document.getElementById("transcript-area").innerHTML = "";
+  document.getElementById("status-area").style.display = "none";
+  document.getElementById("progress-row").innerHTML = "";
+  document.getElementById("empty-state").style.display = "block";
+  document.getElementById("clear-btn").style.display = "none";
+  document.getElementById("run-btn").textContent = "Convene the panel";
+  document.getElementById("run-btn").disabled = false;
+}
+
+// ── Main debate loop ──────────────────────────────────────────────────────────
+async function runDebate() {
+  const doc = document.getElementById("doc-input").value.trim();
+  if (!doc) { alert("Please paste a document or describe the situation to be reviewed."); return; }
+
+  const rounds = parseInt(document.getElementById("rounds-select").value);
+  const btn    = document.getElementById("run-btn");
+  btn.disabled = true;
+  btn.textContent = "Running...";
+
+  document.getElementById("transcript-area").innerHTML = "";
+  document.getElementById("empty-state").style.display = "none";
+  document.getElementById("status-area").style.display = "block";
+  document.getElementById("clear-btn").style.display = "none";
+
+  initProgress(rounds);
+  const transcriptLog = [];
+  let stepIdx = 0;
+
+  try {
+    // ── Coordinator brief ──
+    markProgress(stepIdx, "active");
+    setStatus("Coordinator is briefing the panel...");
+    const brief = await callClaude(sysCoordBrief(), [
+      { role: "user", content: `Document for review:\n\n${doc}` }
+    ]);
+    appendMsg("coord", "Coordinator", brief, null, true, false);
+    markProgress(stepIdx, "done");
+    stepIdx++;
+
+    // ── Debate rounds ──
+    for (let r = 1; r <= rounds; r++) {
+      const history = buildHistory(transcriptLog);
+      const roundPrompt = r === 1
+        ? `Coordinator's brief:\n\n${brief}\n\nDocument:\n\n${doc}\n\nPlease give your opening position.`
+        : `Coordinator's brief:\n\n${brief}\n\nDocument:\n\n${doc}\n\nDebate so far:\n\n${history}\n\nThis is round ${r} of ${rounds}.`;
+
+      for (const ag of AGENTS) {
+        markProgress(stepIdx, "active");
+        const lbl = ag.id === "clapham" ? "Clapham Omnibus" : ag.label;
+        setStatus(`${lbl} is speaking (round ${r} of ${rounds})...`);
+
+        const reply = await callClaude(
+          sysAgent(ag, r, rounds),
+          [{ role: "user", content: roundPrompt }]
+        );
+        transcriptLog.push({ speaker: lbl, round: r, text: reply });
+        appendMsg(ag.id, lbl, reply, r, false, false);
+        markProgress(stepIdx, "done");
+        stepIdx++;
+      }
+    }
+
+    // ── Verdict ──
+    markProgress(stepIdx, "active");
+    setStatus("Coordinator is preparing the verdict...");
+
+    const fullTranscript = buildHistory(transcriptLog);
+    const verdict = await callClaude(sysCoordVerdict(), [{
+      role: "user",
+      content: `Document:\n\n${doc}\n\nFull debate:\n\n${fullTranscript}\n\nPlease produce the verdict.`
+    }]);
+    appendMsg(null, null, verdict, null, false, true);
+    markProgress(stepIdx, "done");
+
+    setStatus("");
+    btn.textContent = "Run again";
+    btn.disabled = false;
+    document.getElementById("clear-btn").style.display = "inline-flex";
+
+  } catch (e) {
+    setStatus(`Error: ${e.message}`);
+    btn.textContent = "Convene the panel";
+    btn.disabled = false;
+  }
+}
+
+// ── Copy verdict ──────────────────────────────────────────────────────────────
+function copyVerdict() {
+  const body = document.getElementById("verdict-body");
+  if (!body) return;
+  navigator.clipboard.writeText(body.innerText).then(() => {
+    const btn = document.querySelector(".copy-btn");
+    if (btn) { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy verdict", 2000); }
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildSidebar();
+if (!getWorkerUrl()) setTimeout(openSettings, 600);
+</script>
+
+<!-- Settings modal -->
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:8px;padding:28px 28px 24px;width:420px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <span style="font-size:15px;font-weight:600;color:#1A1A2E;">Settings</span>
+      <button onclick="closeSettings()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;line-height:1;">&times;</button>
+    </div>
+    <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#666;display:block;margin-bottom:6px;">Cloudflare Worker URL</label>
+    <input type="text" id="settings-worker-url"
+      placeholder="https://ashvaren-ai-proxy.mike-bc0.workers.dev"
+      style="width:100%;font-family:inherit;font-size:13px;padding:9px 11px;border:1px solid #D8D8D8;border-radius:6px;color:#1A1A2E;margin-bottom:6px;">
+    <div style="font-size:11px;color:#888;margin-bottom:20px;">Your existing ashvaren-ai-proxy Worker URL. The /boardroom route will be appended automatically.</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeSettings()" style="padding:8px 16px;font-family:inherit;font-size:13px;background:#fff;border:1px solid #D8D8D8;border-radius:6px;cursor:pointer;color:#666;">Cancel</button>
+      <button onclick="saveSettings()" style="padding:8px 18px;font-family:inherit;font-size:13px;background:#1A1A2E;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Save</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
