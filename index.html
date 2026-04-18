@@ -456,6 +456,172 @@ select:focus { outline: none; border-color: var(--accent); }
 }
 .topbar-settings:hover { border-color: var(--muted); color: var(--text-sec); }
 
+/* ── Two-stage layout ──────────────────────────────────────────────────────── */
+#stage-intake, #stage-boardpack { display: flex; flex-direction: column; gap: 14px; }
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.doc-count {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.cosec-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  background: var(--gold-lo);
+  border: 1px solid rgba(184,154,90,0.2);
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+.action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.action-bar-left, .action-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.rounds-label { font-size: 12px; color: var(--text-sec); white-space: nowrap; font-weight: 400; }
+
+/* Loaded document list */
+#loaded-docs { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+.doc-item.extracting { border-color: var(--accent); }
+.doc-item.done       { border-color: rgba(58,158,116,0.3); }
+.doc-item.error      { border-color: rgba(192,64,74,0.35); }
+.doc-icon { flex-shrink: 0; width: 28px; height: 28px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; letter-spacing: 0.03em; }
+.doc-icon-pdf  { background: rgba(192,64,74,0.12);  color: #e07070; }
+.doc-icon-docx { background: rgba(46,111,196,0.12); color: var(--accent-hi); }
+.doc-icon-pptx { background: rgba(184,134,74,0.12); color: var(--amber); }
+.doc-icon-txt  { background: var(--surface);         color: var(--text-dim); border: 1px solid var(--border); }
+.doc-info { flex: 1; min-width: 0; }
+.doc-name  { font-size: 12px; font-weight: 500; color: var(--text-hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-status { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+.doc-item.done   .doc-status { color: var(--green); }
+.doc-item.error  .doc-status { color: var(--red); }
+.doc-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-dim); padding: 2px 4px; border-radius: 3px;
+  font-size: 14px; line-height: 1; flex-shrink: 0;
+  transition: color 0.12s;
+}
+.doc-remove:hover { color: var(--red); }
+
+/* Board pack */
+.boardpack-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.boardpack-textarea {
+  width: 100%;
+  min-height: 340px;
+  resize: vertical;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.boardpack-textarea:focus { outline: none; border-color: var(--accent); }
+.boardpack-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* ── File upload ────────────────────────────────────────────────────────────── */
+#drop-zone {
+  border: 1px dashed var(--muted);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 0;
+  background: var(--surface-2);
+}
+#drop-zone:hover, #drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-lo);
+}
+#drop-zone-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+#drop-label {
+  font-size: 13px;
+  color: var(--text-sec);
+  font-weight: 400;
+}
+#drop-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+#file-extract-status {
+  font-size: 12px;
+  color: var(--text-sec);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: center;
+  padding: 2px 0;
+}
+#file-extract-status.success { color: var(--green); }
+#file-extract-status.error   { color: var(--red); }
+
+.input-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+.input-divider::before, .input-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.input-divider span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
   .shell { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
@@ -465,6 +631,9 @@ select:focus { outline: none; border-color: var(--accent); }
   .input-row { flex-wrap: wrap; }
 }
 </style>
+  <!-- PDF.js and Mammoth for file extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
 
@@ -490,41 +659,107 @@ select:focus { outline: none; border-color: var(--accent); }
   <!-- Main workspace -->
   <main class="main" id="main">
 
-    <!-- Input card -->
-    <div class="card" id="input-card">
-      <div class="card-title">Document or thesis</div>
-      <textarea id="doc-input"
-        placeholder="Paste your business plan, financial model summary, strategy paper, term sheet, or describe the situation the panel should interrogate..."></textarea>
-      <div class="input-row">
-        <label for="rounds-select">Debate rounds</label>
-        <select id="rounds-select">
-          <option value="1">1 round: quick take</option>
-          <option value="2" selected>2 rounds: standard</option>
-          <option value="3">3 rounds: deep dive</option>
-        </select>
-        <button class="btn-primary" id="run-btn" onclick="runDebate()">
-          Convene the panel
-        </button>
-        <button class="btn-secondary" id="clear-btn" onclick="clearAll()" style="display:none">
-          Clear
-        </button>
+    <!-- ── STAGE 1: Document intake ─────────────────────────────────────── -->
+    <div id="stage-intake">
+
+      <!-- Document list -->
+      <div class="card" id="doc-list-card">
+        <div class="card-title-row">
+          <span class="card-title">Documents</span>
+          <span class="doc-count" id="doc-count">0 documents</span>
+        </div>
+
+        <!-- Drop zone (multi-file) -->
+        <div id="drop-zone"
+          onclick="document.getElementById('file-input').click()"
+          ondragover="handleDragOver(event)"
+          ondragleave="handleDragLeave(event)"
+          ondrop="handleDrop(event)">
+          <input type="file" id="file-input" accept=".pdf,.docx,.doc,.txt,.pptx"
+            multiple style="display:none" onchange="handleFileSelect(event)">
+          <div id="drop-zone-inner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span id="drop-label">Drop files here or click to browse</span>
+            <span id="drop-hint">PDF, Word, PowerPoint, or plain text. Multiple files supported.</span>
+          </div>
+        </div>
+
+        <!-- Loaded document list -->
+        <div id="loaded-docs"></div>
+
+        <div class="input-divider"><span>or paste text directly</span></div>
+        <textarea id="doc-input" placeholder="Paste a document, model summary, or describe the situation..."></textarea>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar" id="intake-actions">
+        <div class="action-bar-left">
+          <label for="rounds-select" class="rounds-label">Debate rounds</label>
+          <select id="rounds-select">
+            <option value="1">1 round: quick take</option>
+            <option value="2" selected>2 rounds: standard</option>
+            <option value="3">3 rounds: deep dive</option>
+          </select>
+        </div>
+        <div class="action-bar-right">
+          <button class="btn-secondary" id="clear-btn" onclick="clearAll()" style="display:none">Clear</button>
+          <button class="btn-secondary" id="cosec-btn" onclick="runCosec()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Prepare board pack
+          </button>
+          <button class="btn-primary" id="run-btn" onclick="runDirect()">
+            Convene the panel
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Status / progress -->
+    <!-- ── STAGE 2: Board pack review ────────────────────────────────────── -->
+    <div id="stage-boardpack" style="display:none">
+      <div class="card" id="boardpack-card">
+        <div class="card-title-row">
+          <span class="card-title">Board pack</span>
+          <span class="cosec-badge">Company Secretary</span>
+        </div>
+        <div class="boardpack-meta" id="boardpack-meta"></div>
+        <textarea id="boardpack-text" class="boardpack-textarea"></textarea>
+        <div class="boardpack-hint">Review and edit the board pack above before convening. The panel will debate this document.</div>
+      </div>
+      <div class="action-bar">
+        <div class="action-bar-left">
+          <button class="btn-secondary" onclick="resetToIntake()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+        </div>
+        <div class="action-bar-right">
+          <label for="rounds-select-2" class="rounds-label">Debate rounds</label>
+          <select id="rounds-select-2">
+            <option value="1">1 round: quick take</option>
+            <option value="2" selected>2 rounds: standard</option>
+            <option value="3">3 rounds: deep dive</option>
+          </select>
+          <button class="btn-primary" id="run-btn-2" onclick="runFromBoardpack()">
+            Convene the panel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Status / progress ─────────────────────────────────────────────── -->
     <div id="status-area" style="display:none">
       <div class="status-bar" id="status-bar"></div>
       <div class="progress-row" id="progress-row" style="margin-top:8px"></div>
     </div>
 
-    <!-- Transcript -->
+    <!-- ── Transcript ────────────────────────────────────────────────────── -->
     <div id="transcript-area"></div>
 
-    <!-- Empty state -->
+    <!-- ── Empty state ───────────────────────────────────────────────────── -->
     <div class="empty-state" id="empty-state">
       <strong>Panel ready</strong>
-      Paste a document above, configure the panel if needed,<br>
-      then convene to begin the debate.
+      Upload documents or paste text, then prepare a board pack<br>
+      or convene the panel directly.
     </div>
 
   </main>
@@ -835,24 +1070,46 @@ function clearAll() {
   document.getElementById("progress-row").innerHTML = "";
   document.getElementById("empty-state").style.display = "block";
   document.getElementById("clear-btn").style.display = "none";
-  document.getElementById("run-btn").textContent = "Convene the panel";
-  document.getElementById("run-btn").disabled = false;
+  // Reset all run buttons
+  ["run-btn","run-btn-2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = "Convene the panel"; el.disabled = false; }
+  });
+  const cosec = document.getElementById("cosec-btn");
+  if (cosec) cosec.disabled = false;
+  // Show intake stage
+  document.getElementById("stage-intake").style.display = "flex";
+  document.getElementById("stage-boardpack").style.display = "none";
+  // Clear document store and textarea
+  docStore.length = 0;
+  renderDocList();
+  document.getElementById("doc-input").value = "";
+  document.getElementById("clear-btn").style.display = "none";
 }
 
 // ── Main debate loop ──────────────────────────────────────────────────────────
-async function runDebate() {
-  const doc = document.getElementById("doc-input").value.trim();
-  if (!doc) { alert("Please paste a document or describe the situation to be reviewed."); return; }
+async function runDebate(docText) {
+  const doc = docText || document.getElementById("doc-input").value.trim();
+  if (!doc) { showToast("Please upload a document or paste some text first."); return; }
 
-  const rounds = parseInt(document.getElementById("rounds-select").value);
-  const btn    = document.getElementById("run-btn");
-  btn.disabled = true;
-  btn.textContent = "Running...";
+  // Determine rounds from whichever select is visible
+  const roundsEl = document.getElementById("rounds-select-2") &&
+    document.getElementById("stage-boardpack").style.display !== "none"
+    ? document.getElementById("rounds-select-2")
+    : document.getElementById("rounds-select");
+  const rounds = parseInt(roundsEl.value);
+
+  // Disable all run buttons
+  ["run-btn","run-btn-2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.disabled = true; el.textContent = "Running..."; }
+  });
 
   document.getElementById("transcript-area").innerHTML = "";
   document.getElementById("empty-state").style.display = "none";
   document.getElementById("status-area").style.display = "block";
-  document.getElementById("clear-btn").style.display = "none";
+  document.getElementById("stage-intake").style.display = "none";
+  document.getElementById("stage-boardpack").style.display = "none";
 
   initProgress(rounds);
   const transcriptLog = [];
@@ -905,14 +1162,19 @@ async function runDebate() {
     markProgress(stepIdx, "done");
 
     setStatus("");
-    btn.textContent = "Run again";
-    btn.disabled = false;
+    ["run-btn","run-btn-2"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = "Run again"; el.disabled = false; }
+    });
     document.getElementById("clear-btn").style.display = "inline-flex";
 
   } catch (e) {
-    setStatus(`Error: ${e.message}`);
-    btn.textContent = "Convene the panel";
-    btn.disabled = false;
+    setStatus("Error: " + e.message);
+    ["run-btn","run-btn-2"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = "Convene the panel"; el.disabled = false; }
+    });
+    document.getElementById("stage-intake").style.display = "flex";
   }
 }
 
@@ -928,7 +1190,307 @@ function copyVerdict() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
-// ── Settings modal ─────────────────────────────────────────────────────────────
+// ── Document store ────────────────────────────────────────────────────────────
+// Each entry: { id, name, ext, text, status: 'extracting'|'done'|'error', error? }
+const docStore = [];
+let docIdSeq = 0;
+
+function getDocId() { return 'd' + (++docIdSeq); }
+
+function allDocsReady() {
+  return docStore.length > 0 && docStore.every(d => d.status === 'done');
+}
+
+function getConsolidatedText() {
+  const textarea = document.getElementById('doc-input').value.trim();
+  const docs = docStore.filter(d => d.status === 'done');
+
+  if (docs.length === 0 && !textarea) return '';
+
+  const parts = [];
+  docs.forEach((d, i) => {
+    parts.push(`=== DOCUMENT ${i + 1}: ${d.name} ===
+
+${d.text}`);
+  });
+  if (textarea) {
+    parts.push(`=== ADDITIONAL CONTEXT ===
+
+${textarea}`);
+  }
+  return parts.join('
+
+---
+
+');
+}
+
+function updateDocCount() {
+  const n = docStore.length;
+  document.getElementById('doc-count').textContent =
+    n === 0 ? '0 documents' : n === 1 ? '1 document' : n + ' documents';
+}
+
+function renderDocList() {
+  const container = document.getElementById('loaded-docs');
+  container.innerHTML = '';
+  docStore.forEach(doc => {
+    const item = document.createElement('div');
+    item.className = 'doc-item ' + doc.status;
+    item.id = 'doc-item-' + doc.id;
+
+    const iconClass = {
+      pdf: 'doc-icon-pdf', docx: 'doc-icon-docx', doc: 'doc-icon-docx',
+      pptx: 'doc-icon-pptx', txt: 'doc-icon-txt', md: 'doc-icon-txt'
+    }[doc.ext] || 'doc-icon-txt';
+
+    const iconLabel = { pdf:'PDF', docx:'DOC', doc:'DOC', pptx:'PPT', txt:'TXT', md:'MD' }[doc.ext] || 'FILE';
+
+    const statusText = doc.status === 'extracting'
+      ? 'Extracting text...'
+      : doc.status === 'error'
+        ? (doc.error || 'Extraction failed')
+        : (doc.wordCount ? doc.wordCount.toLocaleString() + ' words extracted' : 'Ready');
+
+    item.innerHTML = `
+      <div class="doc-icon ${iconClass}">${iconLabel}</div>
+      <div class="doc-info">
+        <div class="doc-name" title="${escHtml(doc.name)}">${escHtml(doc.name)}</div>
+        <div class="doc-status">${doc.status === 'extracting' ? '<span class="spinner" style="width:9px;height:9px;border-width:1.5px;display:inline-block;vertical-align:middle;margin-right:4px;"></span>' : ''}${statusText}</div>
+      </div>
+      ${doc.status !== 'extracting' ? `<button class="doc-remove" title="Remove" onclick="removeDoc('${doc.id}')">&times;</button>` : ''}
+    `;
+    container.appendChild(item);
+  });
+  updateDocCount();
+}
+
+function removeDoc(id) {
+  const idx = docStore.findIndex(d => d.id === id);
+  if (idx >= 0) docStore.splice(idx, 1);
+  renderDocList();
+}
+
+// ── File extraction ────────────────────────────────────────────────────────────
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.add('drag-over');
+}
+function handleDragLeave(e) {
+  document.getElementById('drop-zone').classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  Array.from(e.dataTransfer.files).forEach(f => queueFile(f));
+}
+function handleFileSelect(e) {
+  Array.from(e.target.files).forEach(f => queueFile(f));
+  e.target.value = '';
+}
+
+function getExt(name) {
+  return name.split('.').pop().toLowerCase();
+}
+
+async function queueFile(file) {
+  const ext = getExt(file.name);
+  const allowed = ['pdf','docx','doc','txt','md','pptx'];
+  if (!allowed.includes(ext)) {
+    showToast('Unsupported file type: ' + file.name);
+    return;
+  }
+  const id = getDocId();
+  const doc = { id, name: file.name, ext, text: '', status: 'extracting' };
+  docStore.push(doc);
+  renderDocList();
+
+  try {
+    let text = '';
+    if (ext === 'pdf')              text = await extractPdf(file);
+    else if (ext === 'docx' || ext === 'doc') text = await extractDocx(file);
+    else if (ext === 'pptx')        text = await extractPptx(file);
+    else                            text = await extractPlainText(file);
+
+    if (!text || text.trim().length < 20) throw new Error('No readable text found.');
+
+    doc.text = text.trim();
+    doc.status = 'done';
+    doc.wordCount = text.trim().split(/\s+/).length;
+  } catch(err) {
+    doc.status = 'error';
+    doc.error = err.message;
+  }
+  renderDocList();
+}
+
+async function extractPdf(file) {
+  if (!window.pdfjsLib) throw new Error('PDF library not loaded.');
+  const ab = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+  const parts = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const tc = await page.getTextContent();
+    const t = tc.items.map(item => item.str).join(' ').trim();
+    if (t) parts.push(t);
+  }
+  return parts.join('
+
+');
+}
+
+async function extractDocx(file) {
+  if (!window.mammoth) throw new Error('Word extraction library not loaded.');
+  const ab = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: ab });
+  return result.value;
+}
+
+async function extractPlainText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('Could not read file.'));
+    reader.readAsText(file);
+  });
+}
+
+async function extractPptx(file) {
+  const ab = await file.arrayBuffer();
+  const decoder = new TextDecoder('utf-8', { fatal: false });
+  const raw = decoder.decode(new Uint8Array(ab));
+  const matches = raw.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) || [];
+  const texts = matches.map(m => m.replace(/<[^>]+>/g, '').trim()).filter(t => t.length > 0);
+  if (texts.length === 0) throw new Error('No readable text found. Try saving as PDF first.');
+  return texts.join('
+');
+}
+
+// ── Company Secretary prompt ───────────────────────────────────────────────────
+function sysCoSec() {
+  return `You are the Company Secretary of the Ashvaren Boardroom. Before the board convenes, you prepare a structured board pack from the documents provided.
+
+Your task:
+1. Identify each document: name it, classify it (e.g. financial model, strategy paper, term sheet, business plan, legal document, board update, due diligence report), and summarise it in two to three sentences.
+2. Extract the material facts, key numbers, and critical assumptions across all documents. Note any conflicts or gaps between documents.
+3. Identify the decisions or positions the board is being asked to consider.
+4. Produce a consolidated board pack under these exact headings:
+
+DOCUMENTS IN SCOPE
+List each document with its classification and a two-sentence summary.
+
+MATERIAL FACTS AND FIGURES
+The key quantitative and qualitative facts the board needs. Be specific. Numbers matter.
+
+CONFLICTS AND GAPS
+Anything inconsistent between documents, or material information that is absent and should be.
+
+MATTERS FOR THE BOARD
+The specific decisions, questions, or positions the panel should address. Written as clear statements or questions.
+
+CONTEXT AND BACKGROUND
+Any relevant context that would help the panel assess the documents properly.
+
+Write in plain professional prose. No em dashes. No AI clichés. This document goes directly to the board.`;
+}
+
+// ── Stage control ──────────────────────────────────────────────────────────────
+function showIntake() {
+  document.getElementById('stage-intake').style.display = 'flex';
+  document.getElementById('stage-boardpack').style.display = 'none';
+}
+
+function showBoardpack(text, meta) {
+  document.getElementById('stage-intake').style.display = 'none';
+  document.getElementById('stage-boardpack').style.display = 'flex';
+  document.getElementById('boardpack-text').value = text;
+  document.getElementById('boardpack-meta').textContent = meta || '';
+  document.getElementById('empty-state').style.display = 'none';
+}
+
+function resetToIntake() {
+  showIntake();
+  document.getElementById('transcript-area').innerHTML = '';
+  document.getElementById('status-area').style.display = 'none';
+  document.getElementById('empty-state').style.display = 'block';
+}
+
+// ── Run Company Secretary ──────────────────────────────────────────────────────
+async function runCosec() {
+  const consolidated = getConsolidatedText();
+  if (!consolidated && !document.getElementById('doc-input').value.trim()) {
+    showToast('Please upload at least one document or paste some text first.');
+    return;
+  }
+
+  const btn = document.getElementById('cosec-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:11px;height:11px;border-width:1.5px;"></div> Preparing...';
+
+  try {
+    const input = consolidated || document.getElementById('doc-input').value.trim();
+    const pack = await callClaude(sysCoSec(), [{
+      role: 'user',
+      content: 'Please prepare the board pack from the following documents:
+
+' + input
+    }], 1500);
+
+    const nDocs = docStore.filter(d => d.status === 'done').length;
+    const meta = nDocs > 0
+      ? nDocs + ' document' + (nDocs > 1 ? 's' : '') + ' processed. Review and edit the board pack below, then convene the panel.'
+      : 'Board pack prepared from pasted text. Review and edit below, then convene the panel.';
+
+    showBoardpack(pack, meta);
+  } catch(err) {
+    showToast('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Prepare board pack';
+  }
+}
+
+// ── Run direct (skip Co Sec) ───────────────────────────────────────────────────
+function runDirect() {
+  const consolidated = getConsolidatedText();
+  const pasted = document.getElementById('doc-input').value.trim();
+  const input = consolidated || pasted;
+  if (!input) {
+    showToast('Please upload a document or paste some text first.');
+    return;
+  }
+  runDebate(input);
+}
+
+// ── Run from board pack ────────────────────────────────────────────────────────
+function runFromBoardpack() {
+  const pack = document.getElementById('boardpack-text').value.trim();
+  if (!pack) { showToast('Board pack is empty.'); return; }
+  document.getElementById('stage-boardpack').style.display = 'none';
+  runDebate(pack);
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  let t = document.getElementById('toast-msg');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.style.cssText = 'position:fixed;bottom:22px;right:22px;background:#131b2b;border:1px solid #2e3f5c;color:#a8bdd4;padding:10px 18px;border-radius:6px;font-size:13px;font-family:'Jost',sans-serif;z-index:300;opacity:0;transition:opacity 0.25s;pointer-events:none;max-width:320px;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+// ── Settings modal ─────────────────────────────────────────────────────────────// ── Settings modal ─────────────────────────────────────────────────────────────
 function openSettings() {
   document.getElementById("settings-worker-url").value = getWorkerUrl();
   document.getElementById("settings-overlay").style.display = "flex";
