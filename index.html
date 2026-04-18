@@ -558,6 +558,12 @@ select:focus { outline: none; border-color: var(--accent); }
   margin-top: 8px;
   line-height: 1.5;
 }
+.output-instruction-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
 /* ── File upload ────────────────────────────────────────────────────────────── */
 #drop-zone {
@@ -623,6 +629,65 @@ select:focus { outline: none; border-color: var(--accent); }
   color: var(--text-dim);
   white-space: nowrap;
 }
+
+/* ── Ashvaren briefing card ──────────────────────────────────────────────────── */
+.briefing-card {
+  border-radius: var(--radius);
+  border: 1px solid rgba(184,154,90,0.35);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--gold-lo), var(--shadow);
+  margin-top: 4px;
+}
+.briefing-head {
+  background: var(--gold-lo);
+  border-bottom: 1px solid rgba(184,154,90,0.25);
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.briefing-head-left { display: flex; align-items: center; gap: 10px; }
+.briefing-head-right { display: flex; align-items: center; gap: 8px; }
+.briefing-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  background: rgba(184,154,90,0.15);
+  border: 1px solid rgba(184,154,90,0.3);
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+.briefing-head-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c8a96a;
+}
+.briefing-body {
+  padding: 16px 18px;
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  color: var(--text);
+}
+.export-btn {
+  font-size: 11px;
+  color: var(--gold);
+  background: none;
+  border: 1px solid rgba(184,154,90,0.35);
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.12s;
+}
+.export-btn:hover { background: var(--gold-lo); }
 
 /* ── Mobile ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
@@ -698,11 +763,20 @@ select:focus { outline: none; border-color: var(--accent); }
       <!-- Action bar -->
       <div class="action-bar" id="intake-actions">
         <div class="action-bar-left">
-          <label for="rounds-select" class="rounds-label">Debate rounds</label>
+          <label for="rounds-select" class="rounds-label">Rounds</label>
           <select id="rounds-select">
             <option value="1">1 round: quick take</option>
             <option value="2" selected>2 rounds: standard</option>
             <option value="3">3 rounds: deep dive</option>
+          </select>
+          <label for="output-select" class="rounds-label">Output</label>
+          <select id="output-select" onchange="syncOutputSelect()">
+            <option value="verdict">Verdict only</option>
+            <option value="workshop">Workshop agenda</option>
+            <option value="advisory">Advisory briefing</option>
+            <option value="diligence">Due diligence issues list</option>
+            <option value="qa">Investor Q&amp;A prep</option>
+            <option value="proposal">Engagement proposal outline</option>
           </select>
         </div>
         <div class="action-bar-right">
@@ -729,6 +803,12 @@ select:focus { outline: none; border-color: var(--accent); }
         <textarea id="boardpack-text" class="boardpack-textarea"></textarea>
         <div class="boardpack-hint">Review and edit the board pack above before convening. The panel will debate this document.</div>
       </div>
+      <div class="output-instruction-row">
+        <label class="rounds-label" style="white-space:nowrap">Custom instruction</label>
+        <input type="text" id="custom-instruction"
+          placeholder="Optional: e.g. focus on the fundraise timeline, or prepare a 3-hour workshop agenda..."
+          style="flex:1;font-family:var(--sans);font-size:13px;font-weight:300;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--text);outline:none;">
+      </div>
       <div class="action-bar">
         <div class="action-bar-left">
           <button class="btn-secondary" onclick="resetToIntake()">
@@ -737,11 +817,20 @@ select:focus { outline: none; border-color: var(--accent); }
           </button>
         </div>
         <div class="action-bar-right">
-          <label for="rounds-select-2" class="rounds-label">Debate rounds</label>
+          <label for="rounds-select-2" class="rounds-label">Rounds</label>
           <select id="rounds-select-2">
             <option value="1">1 round: quick take</option>
             <option value="2" selected>2 rounds: standard</option>
             <option value="3">3 rounds: deep dive</option>
+          </select>
+          <label for="output-select-2" class="rounds-label">Output</label>
+          <select id="output-select-2" onchange="syncOutputSelect()">
+            <option value="verdict">Verdict only</option>
+            <option value="workshop">Workshop agenda</option>
+            <option value="advisory">Advisory briefing</option>
+            <option value="diligence">Due diligence issues list</option>
+            <option value="qa">Investor Q&amp;A prep</option>
+            <option value="proposal">Engagement proposal outline</option>
           </select>
           <button class="btn-primary" id="run-btn-2" onclick="runFromBoardpack()">
             Convene the panel
@@ -897,6 +986,76 @@ function getOcean(agentId) {
     vals[key] = el ? parseInt(el.value) : ag.defaults[key];
   });
   return vals;
+}
+
+// ── Output type helpers ───────────────────────────────────────────────────────
+function getOutputType() {
+  const sel2 = document.getElementById('output-select-2');
+  const sel1 = document.getElementById('output-select');
+  const bp = document.getElementById('stage-boardpack');
+  if (sel2 && bp && bp.style.display !== 'none') return sel2.value;
+  return sel1 ? sel1.value : 'verdict';
+}
+
+function getCustomInstruction() {
+  const el = document.getElementById('custom-instruction');
+  return el ? el.value.trim() : '';
+}
+
+function syncOutputSelect() {
+  const sel1 = document.getElementById('output-select');
+  const sel2 = document.getElementById('output-select-2');
+  if (!sel1 || !sel2) return;
+  if (document.activeElement === sel1) sel2.value = sel1.value;
+  else sel1.value = sel2.value;
+}
+
+function outputTypeLabel(type) {
+  return { verdict:'Panel Verdict', workshop:'Workshop Agenda', advisory:'Advisory Briefing',
+           diligence:'Due Diligence Issues List', qa:'Investor Q&A Prep',
+           proposal:'Engagement Proposal Outline' }[type] || 'Ashvaren Briefing';
+}
+
+function sysAshvarenBriefing(outputType, customInstruction) {
+  const base = `You are producing an Ashvaren Advisory deliverable. Ashvaren is an independent advisory practice run by Mike Warriner, combining CFO, COO, legal, and strategic advisory capabilities. The firm serves creative, IP-rich, and growth-stage businesses. Write in plain professional British English. Sentence-case headings. No em dashes. No AI clichés. No filler. Must read as written by a skilled adviser.`;
+  const custom = customInstruction ? ('\n\nAdditional instruction: ' + customInstruction) : '';
+
+  if (outputType === 'workshop') return base + `
+
+Produce a WORKSHOP AGENDA for a one-day advisory workshop with the client. Include named sessions with timings, session objectives, and three to five key questions per session. Sequence sessions so earlier ones build the foundation for decisions later. Include a pre-read list drawn from the documents. End with desired outcomes: what the room should have agreed or resolved by close of day.` + custom;
+
+  if (outputType === 'advisory') return base + `
+
+Produce an ADVISORY BRIEFING for Mike Warriner's internal use. Use these headings:
+
+SITUATION SUMMARY
+What is actually going on here in plain commercial terms. Two to three paragraphs.
+
+THE ADVISORY OPPORTUNITY
+What Ashvaren can specifically help with and why this engagement is worth taking.
+
+KEY RISKS AND WATCH POINTS
+Three to five things that could go wrong or need resolving. Drawn from the panel debate.
+
+QUESTIONS TO RESOLVE BEFORE ADVISING
+Specific things Mike needs to know or verify before he can advise with confidence.
+
+RECOMMENDED INITIAL SCOPE
+What an initial Ashvaren engagement should cover and in what sequence.` + custom;
+
+  if (outputType === 'diligence') return base + `
+
+Produce a DUE DILIGENCE ISSUES LIST by workstream. For each item state the issue clearly, explain why it matters, and specify what information or action closes it. Cover only workstreams relevant to the documents: Financial, Legal and structural, Commercial and market, Operational, Governance and management, Regulatory.` + custom;
+
+  if (outputType === 'qa') return base + `
+
+Produce an INVESTOR OR BOARD Q&A PREPARATION document. For each hard question a sophisticated investor or board member will ask, provide: the question as it will be asked, why it matters to the questioner, and suggested framing for the answer. Be direct. These are the questions that expose weakness. Do not soften them.` + custom;
+
+  if (outputType === 'proposal') return base + `
+
+Produce an ENGAGEMENT PROPOSAL OUTLINE. Structure: situation and context, the problem Ashvaren is engaged to solve, proposed scope of work (phased if appropriate), key deliverables, indicative timeline, and the specific expertise Ashvaren brings. Write as a framework Mike can develop into a formal proposal. Do not include fees.` + custom;
+
+  return base + custom;
 }
 
 // ── System prompts ────────────────────────────────────────────────────────────
@@ -1160,10 +1319,24 @@ async function runDebate(docText) {
     const fullTranscript = buildHistory(transcriptLog);
     const verdict = await callClaude(sysCoordVerdict(), [{
       role: "user",
-      content: `Document:\n\n${doc}\n\nFull debate:\n\n${fullTranscript}\n\nPlease produce the verdict.`
-    }]);
+      content: "Document:\n\n" + doc + "\n\nFull debate:\n\n" + fullTranscript + "\n\nPlease produce the verdict."
+    }], 1500);
     appendMsg(null, null, verdict, null, false, true);
     markProgress(stepIdx, "done");
+
+    // ── Ashvaren briefing (if output type selected) ───────────────────────
+    const outputType = getOutputType();
+    const customInstruction = getCustomInstruction();
+    if (outputType !== "verdict") {
+      setStatus("Preparing " + outputTypeLabel(outputType).toLowerCase() + "...");
+      const briefing = await callClaude(
+        sysAshvarenBriefing(outputType, customInstruction),
+        [{
+          role: "user",
+          content: "Original documents:\n\n" + doc + "\n\nPanel debate:\n\n" + fullTranscript + "\n\nPanel verdict:\n\n" + verdict + "\n\nPlease produce the Ashvaren deliverable."
+        }], 1500);
+      appendBriefing(briefing, outputType);
+    }
 
     setStatus("");
     ["run-btn","run-btn-2"].forEach(id => {
@@ -1190,6 +1363,107 @@ function copyVerdict() {
     const btn = document.querySelector(".copy-btn");
     if (btn) { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy verdict", 2000); }
   });
+}
+
+// ── Ashvaren briefing card ─────────────────────────────────────────────────────
+function appendBriefing(text, outputType) {
+  const area = document.getElementById("transcript-area");
+  const label = outputTypeLabel(outputType);
+
+  const card = document.createElement("div");
+  card.className = "briefing-card";
+  card.id = "briefing-card";
+  card.innerHTML =
+    '<div class="briefing-head">' +
+      '<div class="briefing-head-left">' +
+        '<span class="briefing-badge">Ashvaren Advisory</span>' +
+        '<span class="briefing-head-title">' + label + '</span>' +
+      '</div>' +
+      '<div class="briefing-head-right">' +
+        '<button class="copy-btn" onclick="copyBriefing()">Copy</button>' +
+        '<button class="export-btn" onclick="exportBriefing()">Export .docx</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="briefing-body" id="briefing-body">' + escHtml(text) + '</div>';
+
+  area.appendChild(card);
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function copyBriefing() {
+  const body = document.getElementById("briefing-body");
+  if (!body) return;
+  navigator.clipboard.writeText(body.innerText).then(() => {
+    const btn = document.querySelector(".export-btn");
+    if (btn) { const eb = btn; }
+    const btns = document.querySelectorAll(".briefing-head-right .copy-btn");
+    btns.forEach(b => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 2000); });
+  });
+}
+
+// ── Word document export ───────────────────────────────────────────────────────
+function exportBriefing() {
+  const body = document.getElementById("briefing-body");
+  const outputType = getOutputType();
+  if (!body) return;
+
+  const text = body.innerText;
+  const label = outputTypeLabel(outputType);
+  const date = new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+
+  // Build a simple but clean HTML document and trigger download
+  // Uses a data URI so no server needed
+  const docHtml = buildWordHtml(text, label, date);
+  const blob = new Blob([docHtml], { type: "application/msword;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Ashvaren_" + label.replace(/\s+/g, "_") + "_" + new Date().toISOString().slice(0,10) + ".doc";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function buildWordHtml(text, title, date) {
+  // Format text into HTML with heading detection
+  const lines = text.split("\n");
+  let html = "";
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) { html += "<p>&nbsp;</p>"; continue; }
+    // ALL-CAPS lines are section headings
+    if (t === t.toUpperCase() && t.length > 3 && !/^[0-9]/.test(t) && !/^[•\-]/.test(t)) {
+      html += "<h2>" + escHtmlStr(t) + "</h2>";
+    } else if (t.startsWith("- ") || t.startsWith("* ") || t.startsWith("• ")) {
+      html += "<li>" + escHtmlStr(t.slice(2)) + "</li>";
+    } else {
+      html += "<p>" + escHtmlStr(t) + "</p>";
+    }
+  }
+
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+    xmlns:w="urn:schemas-microsoft-com:office:word"
+    xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<style>
+  body { font-family: Calibri, sans-serif; font-size: 10pt; color: #000; margin: 2.54cm; }
+  h1 { font-size: 14pt; font-weight: bold; margin: 0 0 6pt; }
+  h2 { font-size: 11pt; font-weight: bold; margin: 12pt 0 4pt; }
+  p  { font-size: 10pt; margin: 0 0 6pt; line-height: 1.4; }
+  li { font-size: 10pt; margin: 0 0 3pt; margin-left: 20pt; }
+  .meta { font-size: 9pt; color: #555; margin: 0 0 18pt; }
+  .footer-line { border-top: 1px solid #000; margin-top: 40pt; padding-top: 6pt; font-size: 8pt; color: #555; text-align: center; }
+</style>
+</head>
+<body>
+<h1>${escHtmlStr(title)}</h1>
+<p class="meta">Prepared by: Ashvaren Advisory Limited &nbsp;|&nbsp; Prepared for: Internal use &nbsp;|&nbsp; ${escHtmlStr(date)}</p>
+${html}
+<div class="footer-line">Confidential &nbsp;|&nbsp; ${escHtmlStr(date)} &nbsp;|&nbsp; Ashvaren Advisory Limited &nbsp;|&nbsp; 128 City Road, London EC1V 2NX &nbsp;|&nbsp; Company No. 16950076</div>
+</body></html>`;
+}
+
+function escHtmlStr(t) {
+  return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
