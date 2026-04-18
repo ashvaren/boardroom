@@ -633,9 +633,10 @@ select:focus { outline: none; border-color: var(--accent); }
   .input-row { flex-wrap: wrap; }
 }
 </style>
-  <!-- PDF.js and Mammoth for file extraction -->
+  <!-- PDF.js, Mammoth, and JSZip for file extraction -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -1366,13 +1367,35 @@ async function extractPlainText(file) {
 }
 
 async function extractPptx(file) {
+  if (!window.JSZip) throw new Error('JSZip library not loaded. Refresh and try again.');
   const ab = await file.arrayBuffer();
-  const decoder = new TextDecoder('utf-8', { fatal: false });
-  const raw = decoder.decode(new Uint8Array(ab));
-  const matches = raw.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) || [];
-  const texts = matches.map(m => m.replace(/<[^>]+>/g, '').trim()).filter(t => t.length > 0);
-  if (texts.length === 0) throw new Error('No readable text found. Try saving as PDF first.');
-  return texts.join('\n');
+  const zip = await JSZip.loadAsync(ab);
+
+  // Collect all slide XML files in order (slide1.xml, slide2.xml, ...)
+  const slideFiles = Object.keys(zip.files)
+    .filter(name => /^ppt\/slides\/slide[0-9]+\.xml$/.test(name))
+    .sort((a, b) => {
+      const na = parseInt(a.match(/slide(\d+)/)[1]);
+      const nb = parseInt(b.match(/slide(\d+)/)[1]);
+      return na - nb;
+    });
+
+  if (slideFiles.length === 0) throw new Error('No slides found in this PowerPoint file.');
+
+  const slideTexts = [];
+  for (const name of slideFiles) {
+    const xml = await zip.files[name].async('string');
+    // Extract all <a:t> text run content
+    const matches = xml.match(/<a:t[^>]*>([^<]*)<\/a:t>/g) || [];
+    const text = matches
+      .map(m => m.replace(/<[^>]*>/g, '').trim())
+      .filter(t => t.length > 0)
+      .join(' ');
+    if (text.trim()) slideTexts.push(text.trim());
+  }
+
+  if (slideTexts.length === 0) throw new Error('No readable text found in this PowerPoint file.');
+  return slideTexts.join('\n\n');
 }
 
 // ── Company Secretary prompt ───────────────────────────────────────────────────
